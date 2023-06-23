@@ -9,7 +9,13 @@ import matplotlib.pyplot as plt
 
 
 
-
+def compare_arrays(array1, array2, threshold):
+    mae = np.mean(np.abs(array1 - array2))
+    
+    if mae <= threshold:
+        return True
+    else:
+        return False
 
 
 def image_inference(image_path, threshold, model_cls):
