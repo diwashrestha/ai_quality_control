@@ -37,7 +37,7 @@ if uploaded_file is not None:
 
         col1, col2 = st.columns(2)
         col1.header('Test Image')
-        col1.image(Image.fromarray(inf_out_1[0]))
+        col1.image(Image.fromarray(inf_out_4[0]))
 
         col2.header("Test Result")
         col2.image(Image.fromarray(inf_out_4[1]))
@@ -79,7 +79,7 @@ else:
     
         col1, col2 = st.columns(2)
         col1.header('Sample Image')
-        col1.image(Image.fromarray(inf_out_1[0]))
+        col1.image(Image.fromarray(inf_out_4[0]))
 
         col2.header("Test Result")
         col2.image(Image.fromarray(inf_out_4[1]))
