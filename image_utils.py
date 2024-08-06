@@ -6,6 +6,8 @@ import defect_segmentation
 from torchvision import transforms, utils, datasets
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from tensorflow.keras.models import load_model
+import cv2
 
 
 
@@ -18,13 +20,36 @@ def compare_arrays(array1, array2, threshold):
         return False
 
 
+defect_classify_model = load_model('model/multilabel_model5v2.h5')
+
+def preprocess_test_image(image_dir, image_size):
+    image = cv2.imread(image_dir)
+    image = cv2.resize(image, (image_size[1], image_size[0]))
+
+    image = image /255.0
+    image = np.expand_dims(image, axis=0)
+    return image
+
+def defect_check(image_path, model = defect_classify_model):
+    test_image = preprocess_test_image(image_path, (256, 160))
+    prediction = model.predict(test_image)
+    predicted_labels = (prediction > 0.5).astype(int)
+    predicted_class_indices = np.where(predicted_labels[0] == 1)[0]
+    
+    return(predicted_class_indices.item())
+
+
+
+
+
 def image_inference(image_path, threshold, model_cls):
 
     # Dictionary mapping model class to their respective paths
     model_paths = {
-        1: 'model/cls_1_model.pt',
-        3: 'model/cls_3_model.pt',
-        4: 'model/cls_4_model.pt'
+        1: 'model/seg_1_model.pt',
+        2: 'model/seg_2_model.pt',
+        3: 'model/seg_3_model.pt',
+        4: 'model/seg_4_model.pt'
     }
     
     # Check the availability of CUDA and choose device accordingly
@@ -48,8 +73,6 @@ def image_inference(image_path, threshold, model_cls):
 
     # Transformations for the image
     t1 = transforms.ToTensor()
-    vf = transforms.RandomVerticalFlip()
-    hf = transforms.RandomHorizontalFlip()
     t2 = transforms.Normalize(mean = m , std = s)
     
     # Apply transformations to the image
@@ -81,6 +104,10 @@ def image_inference(image_path, threshold, model_cls):
             img_pred[0, pred_mask >= threshold] = 209
             img_pred[1, pred_mask >= threshold] = 7
             img_pred[2, pred_mask >= threshold] = 8
+        elif model_cls == 2:
+            img_pred[0, pred_mask >= threshold] = 6
+            img_pred[1, pred_mask >= threshold] = 208
+            img_pred[2, pred_mask >= threshold] = 8   
         elif model_cls == 3:
             img_pred[0, pred_mask >= threshold] = 6
             img_pred[1, pred_mask >= threshold] = 208

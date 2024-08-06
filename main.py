@@ -5,7 +5,9 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 from defect_segmentation import UNet, DoubleConvs
-from image_utils import image_inference
+from image_utils import image_inference, defect_check
+from tensorflow.keras.models import load_model
+import cv2
 import random
 
 
@@ -19,6 +21,9 @@ st.title('Steel Defect Detection System 🔍📝')
 uploaded_file = st.file_uploader("Choose a image file", type=['jpg','png','jpeg'])
 if uploaded_file is not None:
     try:
+        defect_result = defect_check('test_images/'+ uploaded_file.name)
+        if defect_result:
+            st.text(defect_result)
         #img_out = image_inference(uploaded_file, 0.5)
         inf_out_1 = image_inference('test_images/'+ uploaded_file.name, 0.5,1)
         inf_out_4 = image_inference('test_images/'+ uploaded_file.name, 0.5,4)
@@ -29,6 +34,9 @@ if uploaded_file is not None:
             st.subheader("Defect: :green[Not Found]✅")
         else:
             st.subheader('Defect: :red[Found]🚨')
+
+        defect_result = defect_check('test_images/'+ uploaded_file.name)
+        print(defect_result)
 
 
         
@@ -64,25 +72,45 @@ else:
     if st.button('Try'):
         # Randomly choose an image from the image deck
         image_number = random.randint(0,8) 
+        
+        defect_result = defect_check(image_deck[image_number])
+        print(defect_result)
 
-        # Perform image inference for different defect classes
-        inf_out_1 = image_inference(image_deck[image_number], 0.5, 1)
-        inf_out_3 = image_inference(image_deck[image_number], 0.5, 3)
-        inf_out_4 = image_inference(image_deck[image_number], 0.5, 4)
+        if defect_result == 1:
+            st.subheader("Defect: :green[Not Found]✅")
+        
+        elif defect_result == 2:
+            st.subheader('Defect: :red[Class 1 Found]🚨')
+            inf_out = image_inference(image_deck[image_number], 0.5, 1)
+        elif defect_result == 3:
+            st.subheader('Defect: :red[Class 2 Found]🚨')
+            inf_out = image_inference(image_deck[image_number], 0.5, 2)
+        elif defect_result == 4:
+            st.subheader('Defect: :red[Class 3 Found]🚨')
+            inf_out = image_inference(image_deck[image_number], 0.5, 3)
+        elif defect_result == 5:
+            st.subheader('Defect: :red[Class 4 Found]🚨')
+            inf_out = image_inference(image_deck[image_number], 0.5, 4)
 
-        defect_bool = np.allclose(inf_out_4[1],inf_out_4[0],rtol=1)
+        
+        defect_bool = np.allclose(inf_out[1],inf_out[0],rtol=1)
         if defect_bool:
             st.subheader("Defect: :green[Not Found]✅")
         else:
             st.subheader('Defect: :red[Found]🚨')
+            
 
+        # Perform image inference for different defect classes
+        # inf_out_1 = image_inference(image_deck[image_number], 0.5, 1)
+        # inf_out_3 = image_inference(image_deck[image_number], 0.5, 3)
+        # inf_out_4 = image_inference(image_deck[image_number], 0.5, 4)
     
         col1, col2 = st.columns(2)
         col1.header('Sample Image')
-        col1.image(Image.fromarray(inf_out_4[0]))
+        col1.image(Image.fromarray(inf_out[0]))
 
         col2.header("Test Result")
-        col2.image(Image.fromarray(inf_out_4[1]))
+        col2.image(Image.fromarray(inf_out[1]))
         
     
     col1, col2, col3, col4 = st.columns(4)
