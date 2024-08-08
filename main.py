@@ -83,8 +83,8 @@ else:
             st.subheader('Defect: :red[Class 1 Found]🚨')
             inf_out = image_inference(image_deck[image_number], 0.5, 1)
         elif defect_result == 3:
-            st.subheader('Defect: :red[Class 2 Found]🚨')
-            inf_out = image_inference(image_deck[image_number], 0.5, 2)
+            st.subheader('Defect: :green[Not Found]✅')
+            # inf_out = image_inference(image_deck[image_number], 0.5, 2)
         elif defect_result == 4:
             st.subheader('Defect: :red[Class 3 Found]🚨')
             inf_out = image_inference(image_deck[image_number], 0.5, 3)
@@ -93,11 +93,11 @@ else:
             inf_out = image_inference(image_deck[image_number], 0.5, 4)
 
         
-        defect_bool = np.allclose(inf_out[1],inf_out[0],rtol=1)
-        if defect_bool:
-            st.subheader("Defect: :green[Not Found]✅")
-        else:
-            st.subheader('Defect: :red[Found]🚨')
+        # defect_bool = np.allclose(inf_out[1],inf_out[0],rtol=1)
+        # if defect_bool:
+        #     st.subheader("Defect: :green[Not Found]✅")
+        # else:
+        #     st.subheader('Defect: :red[Found]🚨')
             
 
         # Perform image inference for different defect classes
